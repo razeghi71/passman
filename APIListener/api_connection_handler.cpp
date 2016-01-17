@@ -3,11 +3,8 @@
 
 APIConnectionHandler::APIConnectionHandler()
 {
-
 }
 
 void APIConnectionHandler::handle(QLocalSocket *sock)
 {
-
 }
-

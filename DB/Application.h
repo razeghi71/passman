@@ -17,8 +17,12 @@ class Application
   string executable_path;
   string executable_hash;
 public :
+  Application(string executable_path, string executable_hash);
   string getExecutablePath() const;
   string getExecutableHash() const;
+
+  void setExecutableHash(const string &value);
+  void setExecutablePath(const string &value);
 };
 
 #endif
