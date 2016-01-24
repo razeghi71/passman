@@ -15,29 +15,14 @@ void APIMessageViewerConnectionHandler::handle(QLocalSocket *sock)
     QString execPath = credentialExtractor->getExecPath();
     APIMessageViewer *messageViewer = new APIMessageViewer(execFileHash, execPath, device);
 
-    while(true)
-    {
-        sock->waitForReadyRead();
-        QList<QByteArray> command = sock->readLine(1024).trimmed().split(' ');
+    sock->waitForReadyRead();
+    QString message = sock->readLine();
+    bool allowed = messageViewer->Ask(message.trimmed());
+    if (allowed)
+        sock->write("1\n");
+    else
+        sock->write("0\n");
 
-        if(command[0] == "end" || command[0] == "")
-        {
-            break;
-        }
-        if(command[0] == "view")
-        {
-            QString message;
-            for (int i = 1 ; i < command.length(); i++ )
-            {
-                message += command[i] + " ";
-            }
-            bool allowed = messageViewer->Ask(message.trimmed());
-            if (allowed)
-                sock->write("1\n");
-            else
-                sock->write("0\n");
-        }
-    }
     sock->flush();
     sock->close();
     QCoreApplication::quit();

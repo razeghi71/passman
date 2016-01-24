@@ -41,6 +41,26 @@ namespace odb
 
   access::object_traits_impl< ::Application, id_mysql >::id_type
   access::object_traits_impl< ::Application, id_mysql >::
+  id (const id_image_type& i)
+  {
+    mysql::database* db (0);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    id_type id;
+    {
+      mysql::value_traits<
+          int,
+          mysql::id_long >::set_value (
+        id,
+        i.id_value,
+        i.id_null);
+    }
+
+    return id;
+  }
+
+  access::object_traits_impl< ::Application, id_mysql >::id_type
+  access::object_traits_impl< ::Application, id_mysql >::
   id (const image_type& i)
   {
     mysql::database* db (0);
@@ -52,8 +72,8 @@ namespace odb
           int,
           mysql::id_long >::set_value (
         id,
-        i.app_id_value,
-        i.app_id_null);
+        i.appId_value,
+        i.appId_null);
     }
 
     return id;
@@ -68,23 +88,23 @@ namespace odb
 
     bool grew (false);
 
-    // app_id
+    // appId
     //
     t[0UL] = 0;
 
-    // executable_path
+    // executablePath
     //
     if (t[1UL])
     {
-      i.executable_path_value.capacity (i.executable_path_size);
+      i.executablePath_value.capacity (i.executablePath_size);
       grew = true;
     }
 
-    // executable_hash
+    // executableHash
     //
     if (t[2UL])
     {
-      i.executable_hash_value.capacity (i.executable_hash_size);
+      i.executableHash_value.capacity (i.executableHash_size);
       grew = true;
     }
 
@@ -102,35 +122,35 @@ namespace odb
 
     std::size_t n (0);
 
-    // app_id
+    // appId
     //
     if (sk != statement_update)
     {
       b[n].buffer_type = MYSQL_TYPE_LONG;
       b[n].is_unsigned = 0;
-      b[n].buffer = &i.app_id_value;
-      b[n].is_null = &i.app_id_null;
+      b[n].buffer = &i.appId_value;
+      b[n].is_null = &i.appId_null;
       n++;
     }
 
-    // executable_path
+    // executablePath
     //
     b[n].buffer_type = MYSQL_TYPE_STRING;
-    b[n].buffer = i.executable_path_value.data ();
+    b[n].buffer = i.executablePath_value.data ();
     b[n].buffer_length = static_cast<unsigned long> (
-      i.executable_path_value.capacity ());
-    b[n].length = &i.executable_path_size;
-    b[n].is_null = &i.executable_path_null;
+      i.executablePath_value.capacity ());
+    b[n].length = &i.executablePath_size;
+    b[n].is_null = &i.executablePath_null;
     n++;
 
-    // executable_hash
+    // executableHash
     //
     b[n].buffer_type = MYSQL_TYPE_STRING;
-    b[n].buffer = i.executable_hash_value.data ();
+    b[n].buffer = i.executableHash_value.data ();
     b[n].buffer_length = static_cast<unsigned long> (
-      i.executable_hash_value.capacity ());
-    b[n].length = &i.executable_hash_size;
-    b[n].is_null = &i.executable_hash_null;
+      i.executableHash_value.capacity ());
+    b[n].length = &i.executableHash_size;
+    b[n].is_null = &i.executableHash_null;
     n++;
   }
 
@@ -157,61 +177,61 @@ namespace odb
 
     bool grew (false);
 
-    // app_id
+    // appId
     //
     if (sk == statement_insert)
     {
       int const& v =
-        o.app_id;
+        o.appId;
 
       bool is_null (false);
       mysql::value_traits<
           int,
           mysql::id_long >::set_image (
-        i.app_id_value, is_null, v);
-      i.app_id_null = is_null;
+        i.appId_value, is_null, v);
+      i.appId_null = is_null;
     }
 
-    // executable_path
+    // executablePath
     //
     {
       ::std::string const& v =
-        o.executable_path;
+        o.executablePath;
 
       bool is_null (false);
       std::size_t size (0);
-      std::size_t cap (i.executable_path_value.capacity ());
+      std::size_t cap (i.executablePath_value.capacity ());
       mysql::value_traits<
           ::std::string,
           mysql::id_string >::set_image (
-        i.executable_path_value,
+        i.executablePath_value,
         size,
         is_null,
         v);
-      i.executable_path_null = is_null;
-      i.executable_path_size = static_cast<unsigned long> (size);
-      grew = grew || (cap != i.executable_path_value.capacity ());
+      i.executablePath_null = is_null;
+      i.executablePath_size = static_cast<unsigned long> (size);
+      grew = grew || (cap != i.executablePath_value.capacity ());
     }
 
-    // executable_hash
+    // executableHash
     //
     {
       ::std::string const& v =
-        o.executable_hash;
+        o.executableHash;
 
       bool is_null (false);
       std::size_t size (0);
-      std::size_t cap (i.executable_hash_value.capacity ());
+      std::size_t cap (i.executableHash_value.capacity ());
       mysql::value_traits<
           ::std::string,
           mysql::id_string >::set_image (
-        i.executable_hash_value,
+        i.executableHash_value,
         size,
         is_null,
         v);
-      i.executable_hash_null = is_null;
-      i.executable_hash_size = static_cast<unsigned long> (size);
-      grew = grew || (cap != i.executable_hash_value.capacity ());
+      i.executableHash_null = is_null;
+      i.executableHash_size = static_cast<unsigned long> (size);
+      grew = grew || (cap != i.executableHash_value.capacity ());
     }
 
     return grew;
@@ -226,48 +246,48 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (i);
     ODB_POTENTIALLY_UNUSED (db);
 
-    // app_id
+    // appId
     //
     {
       int& v =
-        o.app_id;
+        o.appId;
 
       mysql::value_traits<
           int,
           mysql::id_long >::set_value (
         v,
-        i.app_id_value,
-        i.app_id_null);
+        i.appId_value,
+        i.appId_null);
     }
 
-    // executable_path
+    // executablePath
     //
     {
       ::std::string& v =
-        o.executable_path;
+        o.executablePath;
 
       mysql::value_traits<
           ::std::string,
           mysql::id_string >::set_value (
         v,
-        i.executable_path_value,
-        i.executable_path_size,
-        i.executable_path_null);
+        i.executablePath_value,
+        i.executablePath_size,
+        i.executablePath_null);
     }
 
-    // executable_hash
+    // executableHash
     //
     {
       ::std::string& v =
-        o.executable_hash;
+        o.executableHash;
 
       mysql::value_traits<
           ::std::string,
           mysql::id_string >::set_value (
         v,
-        i.executable_hash_value,
-        i.executable_hash_size,
-        i.executable_hash_null);
+        i.executableHash_value,
+        i.executableHash_size,
+        i.executableHash_null);
     }
   }
 
@@ -286,36 +306,36 @@ namespace odb
 
   const char access::object_traits_impl< ::Application, id_mysql >::persist_statement[] =
   "INSERT INTO `Application` "
-  "(`app_id`, "
-  "`executable_path`, "
-  "`executable_hash`) "
+  "(`appId`, "
+  "`executablePath`, "
+  "`executableHash`) "
   "VALUES "
   "(?, ?, ?)";
 
   const char access::object_traits_impl< ::Application, id_mysql >::find_statement[] =
   "SELECT "
-  "`Application`.`app_id`, "
-  "`Application`.`executable_path`, "
-  "`Application`.`executable_hash` "
+  "`Application`.`appId`, "
+  "`Application`.`executablePath`, "
+  "`Application`.`executableHash` "
   "FROM `Application` "
-  "WHERE `Application`.`app_id`=?";
+  "WHERE `Application`.`appId`=?";
 
   const char access::object_traits_impl< ::Application, id_mysql >::update_statement[] =
   "UPDATE `Application` "
   "SET "
-  "`executable_path`=?, "
-  "`executable_hash`=? "
-  "WHERE `app_id`=?";
+  "`executablePath`=?, "
+  "`executableHash`=? "
+  "WHERE `appId`=?";
 
   const char access::object_traits_impl< ::Application, id_mysql >::erase_statement[] =
   "DELETE FROM `Application` "
-  "WHERE `app_id`=?";
+  "WHERE `appId`=?";
 
   const char access::object_traits_impl< ::Application, id_mysql >::query_statement[] =
   "SELECT "
-  "`Application`.`app_id`, "
-  "`Application`.`executable_path`, "
-  "`Application`.`executable_hash` "
+  "`Application`.`appId`, "
+  "`Application`.`executablePath`, "
+  "`Application`.`executableHash` "
   "FROM `Application`";
 
   const char access::object_traits_impl< ::Application, id_mysql >::erase_query_statement[] =
@@ -325,7 +345,7 @@ namespace odb
   "`Application`";
 
   void access::object_traits_impl< ::Application, id_mysql >::
-  persist (database& db, const object_type& obj)
+  persist (database& db, object_type& obj)
   {
     ODB_POTENTIALLY_UNUSED (db);
 
@@ -337,7 +357,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::pre_persist);
 
     image_type& im (sts.image ());
@@ -345,6 +365,8 @@ namespace odb
 
     if (init (im, obj, statement_insert))
       im.version++;
+
+    im.appId_value = 0;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -354,12 +376,25 @@ namespace odb
       imb.version++;
     }
 
+    {
+      id_image_type& i (sts.id_image ());
+      binding& b (sts.id_image_binding ());
+      if (i.version != sts.id_image_version () || b.version == 0)
+      {
+        bind (b.bind, i);
+        sts.id_image_version (i.version);
+        b.version++;
+      }
+    }
+
     insert_statement& st (sts.persist_statement ());
     if (!st.execute ())
       throw object_already_persistent ();
 
+    obj.appId = id (sts.id_image ());
+
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::post_persist);
   }
 
@@ -379,7 +414,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     const id_type& id (
-      obj.app_id);
+      obj.appId);
     id_image_type& idi (sts.id_image ());
     init (idi, id);
 
@@ -555,7 +590,7 @@ namespace odb
     statements_type::auto_lock l (sts);
 
     const id_type& id  (
-      obj.app_id);
+      obj.appId);
 
     if (!find_ (sts, &id))
       return false;

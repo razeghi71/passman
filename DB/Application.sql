@@ -5,8 +5,8 @@
 DROP TABLE IF EXISTS `Application`;
 
 CREATE TABLE `Application` (
-  `app_id` INT NOT NULL PRIMARY KEY,
-  `executable_path` TEXT NOT NULL,
-  `executable_hash` TEXT NOT NULL)
+  `appId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `executablePath` TEXT NOT NULL,
+  `executableHash` TEXT NOT NULL)
  ENGINE=InnoDB;
 

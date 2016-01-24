@@ -1,7 +1,33 @@
 TEMPLATE = subdirs
-SUBDIRS = Vkeyboard Connection PasswordChecker PasswordGetter Main ApplicationRunner DB APIListener APIMessageViewer
+SUBDIRS = Vkeyboard \
+          Connection \
+          Encryption \
+          PasswordChecker \
+          PasswordGetter \
+          ApplicationRunner \
+          DB \
+          APIMessageViewer \
+          APIListener \
+          Main
+
 PasswordChecker.depends = Connection
-PasswordGetter.depends = Connection Vkeyboard
-APIListener.depends = Connection ApplicationRunner DB
-APIMessageViewer.depends = Connection Vkeyboard
-Main.depends = Connection ApplicationRunner
+
+PasswordGetter.depends = Connection \
+                         Vkeyboard
+
+
+APIMessageViewer.depends = Connection \
+                           Vkeyboard
+
+APIListener.depends = Connection \
+                      ApplicationRunner \
+                      DB \
+                      Encryption
+
+
+Main.depends = Connection \
+               DB \
+               Encryption \
+               ApplicationRunner \
+               APIListener
+

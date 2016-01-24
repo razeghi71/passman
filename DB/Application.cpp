@@ -1,27 +1,32 @@
-#include<Application.h>
+#include "Application.h"
 
-Application::Application(string executable_path, string executable_hash)
+string Application::getExecutablePath() const
 {
-    this->executable_hash = executable_hash;
-    this->executable_path = executable_path;
-}
-
-void Application::setExecutableHash(const string &value)
-{
-    executable_hash = value;
+    return executablePath;
 }
 
 void Application::setExecutablePath(const string &value)
 {
-    executable_path = value;
-}
-
-string Application::getExecutablePath() const
-{
-    return executable_path;
+    executablePath = value;
 }
 
 string Application::getExecutableHash() const
 {
-    return executable_hash;
+    return executableHash;
+}
+
+void Application::setExecutableHash(const string &value)
+{
+    executableHash = value;
+}
+
+int Application::getAppId() const
+{
+    return appId;
+}
+
+Application::Application(string executable_path, string executable_hash)
+{
+    this->executableHash = executable_hash;
+    this->executablePath = executable_path;
 }

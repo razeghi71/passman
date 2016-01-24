@@ -53,7 +53,7 @@ namespace odb
 
     typedef int id_type;
 
-    static const bool auto_id = false;
+    static const bool auto_id = true;
 
     static const bool abstract = false;
 
@@ -91,7 +91,7 @@ namespace odb
   template <typename A>
   struct query_columns< ::Application, id_mysql, A >
   {
-    // app_id
+    // appId
     //
     typedef
     mysql::query_column<
@@ -99,11 +99,11 @@ namespace odb
         int,
         mysql::id_long >::query_type,
       mysql::id_long >
-    app_id_type_;
+    appId_type_;
 
-    static const app_id_type_ app_id;
+    static const appId_type_ appId;
 
-    // executable_path
+    // executablePath
     //
     typedef
     mysql::query_column<
@@ -111,11 +111,11 @@ namespace odb
         ::std::string,
         mysql::id_string >::query_type,
       mysql::id_string >
-    executable_path_type_;
+    executablePath_type_;
 
-    static const executable_path_type_ executable_path;
+    static const executablePath_type_ executablePath;
 
-    // executable_hash
+    // executableHash
     //
     typedef
     mysql::query_column<
@@ -123,25 +123,25 @@ namespace odb
         ::std::string,
         mysql::id_string >::query_type,
       mysql::id_string >
-    executable_hash_type_;
+    executableHash_type_;
 
-    static const executable_hash_type_ executable_hash;
+    static const executableHash_type_ executableHash;
   };
 
   template <typename A>
-  const typename query_columns< ::Application, id_mysql, A >::app_id_type_
+  const typename query_columns< ::Application, id_mysql, A >::appId_type_
   query_columns< ::Application, id_mysql, A >::
-  app_id (A::table_name, "`app_id`", 0);
+  appId (A::table_name, "`appId`", 0);
 
   template <typename A>
-  const typename query_columns< ::Application, id_mysql, A >::executable_path_type_
+  const typename query_columns< ::Application, id_mysql, A >::executablePath_type_
   query_columns< ::Application, id_mysql, A >::
-  executable_path (A::table_name, "`executable_path`", 0);
+  executablePath (A::table_name, "`executablePath`", 0);
 
   template <typename A>
-  const typename query_columns< ::Application, id_mysql, A >::executable_hash_type_
+  const typename query_columns< ::Application, id_mysql, A >::executableHash_type_
   query_columns< ::Application, id_mysql, A >::
-  executable_hash (A::table_name, "`executable_hash`", 0);
+  executableHash (A::table_name, "`executableHash`", 0);
 
   template <typename A>
   struct pointer_query_columns< ::Application, id_mysql, A >:
@@ -164,22 +164,22 @@ namespace odb
 
     struct image_type
     {
-      // app_id
+      // appId
       //
-      int app_id_value;
-      my_bool app_id_null;
+      int appId_value;
+      my_bool appId_null;
 
-      // executable_path
+      // executablePath
       //
-      details::buffer executable_path_value;
-      unsigned long executable_path_size;
-      my_bool executable_path_null;
+      details::buffer executablePath_value;
+      unsigned long executablePath_size;
+      my_bool executablePath_null;
 
-      // executable_hash
+      // executableHash
       //
-      details::buffer executable_hash_value;
-      unsigned long executable_hash_size;
-      my_bool executable_hash_null;
+      details::buffer executableHash_value;
+      unsigned long executableHash_size;
+      my_bool executableHash_null;
 
       std::size_t version;
     };
@@ -187,6 +187,9 @@ namespace odb
     struct extra_statement_cache_type;
 
     using object_traits<object_type>::id;
+
+    static id_type
+    id (const id_image_type&);
 
     static id_type
     id (const image_type&);
@@ -241,7 +244,7 @@ namespace odb
     static const char table_name[];
 
     static void
-    persist (database&, const object_type&);
+    persist (database&, object_type&);
 
     static pointer_type
     find (database&, const id_type&);

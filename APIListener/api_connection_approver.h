@@ -7,15 +7,16 @@
 
 class APIConnectionApprover : public Approver
 {
+    QString messageViewerSocket;
     QString messageViewerPath;
     User normalUser;
 public:
-    APIConnectionApprover(QString messageViewerPath, User normalUser);
+    APIConnectionApprover(QString messageViewerSocket , QString messageViewerPath, User normalUser);
     void startMessageViewer();
     bool viewMessage(QString message);
     bool Approve(QLocalSocket *sock);
-    void handleNewApp(QString execFileHash, QString execPath, auto_ptr<odb::database> db);
-    void handleUpdatedApp(QString execFileHash, ApplicationResult appExecEqualQuery, QString execPath, auto_ptr<odb::database> db);
+    void handleNewApp(QLocalSocket *sock);
+    void handleUpdatedApp(QLocalSocket *sock, Application& app);
 };
 
 #endif // APICONNECTIONAPPROVER_H

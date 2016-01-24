@@ -46,6 +46,26 @@ namespace odb
 
   access::object_traits_impl< ::ApplicationPassword, id_mysql >::id_type
   access::object_traits_impl< ::ApplicationPassword, id_mysql >::
+  id (const id_image_type& i)
+  {
+    mysql::database* db (0);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    id_type id;
+    {
+      mysql::value_traits<
+          int,
+          mysql::id_long >::set_value (
+        id,
+        i.id_value,
+        i.id_null);
+    }
+
+    return id;
+  }
+
+  access::object_traits_impl< ::ApplicationPassword, id_mysql >::id_type
+  access::object_traits_impl< ::ApplicationPassword, id_mysql >::
   id (const image_type& i)
   {
     mysql::database* db (0);
@@ -81,25 +101,9 @@ namespace odb
     //
     t[1UL] = 0;
 
-    // title
-    //
-    if (t[2UL])
-    {
-      i.title_value.capacity (i.title_size);
-      grew = true;
-    }
-
-    // url
-    //
-    if (t[3UL])
-    {
-      i.url_value.capacity (i.url_size);
-      grew = true;
-    }
-
     // username
     //
-    if (t[4UL])
+    if (t[2UL])
     {
       i.username_value.capacity (i.username_size);
       grew = true;
@@ -107,7 +111,7 @@ namespace odb
 
     // password
     //
-    if (t[5UL])
+    if (t[3UL])
     {
       i.password_value.capacity (i.password_size);
       grew = true;
@@ -146,26 +150,6 @@ namespace odb
     b[n].is_null = &i.app_null;
     n++;
 
-    // title
-    //
-    b[n].buffer_type = MYSQL_TYPE_STRING;
-    b[n].buffer = i.title_value.data ();
-    b[n].buffer_length = static_cast<unsigned long> (
-      i.title_value.capacity ());
-    b[n].length = &i.title_size;
-    b[n].is_null = &i.title_null;
-    n++;
-
-    // url
-    //
-    b[n].buffer_type = MYSQL_TYPE_STRING;
-    b[n].buffer = i.url_value.data ();
-    b[n].buffer_length = static_cast<unsigned long> (
-      i.url_value.capacity ());
-    b[n].length = &i.url_size;
-    b[n].is_null = &i.url_null;
-    n++;
-
     // username
     //
     b[n].buffer_type = MYSQL_TYPE_STRING;
@@ -178,7 +162,7 @@ namespace odb
 
     // password
     //
-    b[n].buffer_type = MYSQL_TYPE_STRING;
+    b[n].buffer_type = MYSQL_TYPE_BLOB;
     b[n].buffer = i.password_value.data ();
     b[n].buffer_length = static_cast<unsigned long> (
       i.password_value.capacity ());
@@ -250,48 +234,6 @@ namespace odb
         i.app_null = 1;
     }
 
-    // title
-    //
-    {
-      ::odb::nullable< ::std::basic_string< char > > const& v =
-        o.title;
-
-      bool is_null (true);
-      std::size_t size (0);
-      std::size_t cap (i.title_value.capacity ());
-      mysql::value_traits<
-          ::odb::nullable< ::std::basic_string< char > >,
-          mysql::id_string >::set_image (
-        i.title_value,
-        size,
-        is_null,
-        v);
-      i.title_null = is_null;
-      i.title_size = static_cast<unsigned long> (size);
-      grew = grew || (cap != i.title_value.capacity ());
-    }
-
-    // url
-    //
-    {
-      ::odb::nullable< ::std::basic_string< char > > const& v =
-        o.url;
-
-      bool is_null (true);
-      std::size_t size (0);
-      std::size_t cap (i.url_value.capacity ());
-      mysql::value_traits<
-          ::odb::nullable< ::std::basic_string< char > >,
-          mysql::id_string >::set_image (
-        i.url_value,
-        size,
-        is_null,
-        v);
-      i.url_null = is_null;
-      i.url_size = static_cast<unsigned long> (size);
-      grew = grew || (cap != i.url_value.capacity ());
-    }
-
     // username
     //
     {
@@ -316,15 +258,15 @@ namespace odb
     // password
     //
     {
-      ::std::string const& v =
+      ::std::vector< unsigned char > const& v =
         o.password;
 
       bool is_null (false);
       std::size_t size (0);
       std::size_t cap (i.password_value.capacity ());
       mysql::value_traits<
-          ::std::string,
-          mysql::id_string >::set_image (
+          ::std::vector< unsigned char >,
+          mysql::id_blob >::set_image (
         i.password_value,
         size,
         is_null,
@@ -391,36 +333,6 @@ namespace odb
       }
     }
 
-    // title
-    //
-    {
-      ::odb::nullable< ::std::basic_string< char > >& v =
-        o.title;
-
-      mysql::value_traits<
-          ::odb::nullable< ::std::basic_string< char > >,
-          mysql::id_string >::set_value (
-        v,
-        i.title_value,
-        i.title_size,
-        i.title_null);
-    }
-
-    // url
-    //
-    {
-      ::odb::nullable< ::std::basic_string< char > >& v =
-        o.url;
-
-      mysql::value_traits<
-          ::odb::nullable< ::std::basic_string< char > >,
-          mysql::id_string >::set_value (
-        v,
-        i.url_value,
-        i.url_size,
-        i.url_null);
-    }
-
     // username
     //
     {
@@ -439,12 +351,12 @@ namespace odb
     // password
     //
     {
-      ::std::string& v =
+      ::std::vector< unsigned char >& v =
         o.password;
 
       mysql::value_traits<
-          ::std::string,
-          mysql::id_string >::set_value (
+          ::std::vector< unsigned char >,
+          mysql::id_blob >::set_value (
         v,
         i.password_value,
         i.password_size,
@@ -469,19 +381,15 @@ namespace odb
   "INSERT INTO `ApplicationPassword` "
   "(`passwordID`, "
   "`app`, "
-  "`title`, "
-  "`url`, "
   "`username`, "
   "`password`) "
   "VALUES "
-  "(?, ?, ?, ?, ?, ?)";
+  "(?, ?, ?, ?)";
 
   const char access::object_traits_impl< ::ApplicationPassword, id_mysql >::find_statement[] =
   "SELECT "
   "`ApplicationPassword`.`passwordID`, "
   "`ApplicationPassword`.`app`, "
-  "`ApplicationPassword`.`title`, "
-  "`ApplicationPassword`.`url`, "
   "`ApplicationPassword`.`username`, "
   "`ApplicationPassword`.`password` "
   "FROM `ApplicationPassword` "
@@ -491,8 +399,6 @@ namespace odb
   "UPDATE `ApplicationPassword` "
   "SET "
   "`app`=?, "
-  "`title`=?, "
-  "`url`=?, "
   "`username`=?, "
   "`password`=? "
   "WHERE `passwordID`=?";
@@ -505,12 +411,10 @@ namespace odb
   "SELECT\n"
   "`ApplicationPassword`.`passwordID`,\n"
   "`ApplicationPassword`.`app`,\n"
-  "`ApplicationPassword`.`title`,\n"
-  "`ApplicationPassword`.`url`,\n"
   "`ApplicationPassword`.`username`,\n"
   "`ApplicationPassword`.`password`\n"
   "FROM `ApplicationPassword`\n"
-  "LEFT JOIN `Application` AS `app` ON `app`.`app_id`=`ApplicationPassword`.`app`";
+  "LEFT JOIN `Application` AS `app` ON `app`.`appId`=`ApplicationPassword`.`app`";
 
   const char access::object_traits_impl< ::ApplicationPassword, id_mysql >::erase_query_statement[] =
   "DELETE FROM `ApplicationPassword`";
@@ -519,7 +423,7 @@ namespace odb
   "`ApplicationPassword`";
 
   void access::object_traits_impl< ::ApplicationPassword, id_mysql >::
-  persist (database& db, const object_type& obj)
+  persist (database& db, object_type& obj)
   {
     ODB_POTENTIALLY_UNUSED (db);
 
@@ -531,7 +435,7 @@ namespace odb
       conn.statement_cache ().find_object<object_type> ());
 
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::pre_persist);
 
     image_type& im (sts.image ());
@@ -539,6 +443,8 @@ namespace odb
 
     if (init (im, obj, statement_insert))
       im.version++;
+
+    im.passwordID_value = 0;
 
     if (im.version != sts.insert_image_version () ||
         imb.version == 0)
@@ -548,12 +454,25 @@ namespace odb
       imb.version++;
     }
 
+    {
+      id_image_type& i (sts.id_image ());
+      binding& b (sts.id_image_binding ());
+      if (i.version != sts.id_image_version () || b.version == 0)
+      {
+        bind (b.bind, i);
+        sts.id_image_version (i.version);
+        b.version++;
+      }
+    }
+
     insert_statement& st (sts.persist_statement ());
     if (!st.execute ())
       throw object_already_persistent ();
 
+    obj.passwordID = id (sts.id_image ());
+
     callback (db,
-              obj,
+              static_cast<const object_type&> (obj),
               callback_event::post_persist);
   }
 

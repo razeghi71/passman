@@ -55,7 +55,7 @@ namespace odb
 
     typedef int id_type;
 
-    static const bool auto_id = false;
+    static const bool auto_id = true;
 
     static const bool abstract = false;
 
@@ -117,30 +117,6 @@ namespace odb
 
     static const app_type_ app;
 
-    // title
-    //
-    typedef
-    mysql::query_column<
-      mysql::value_traits<
-        ::std::basic_string< char >,
-        mysql::id_string >::query_type,
-      mysql::id_string >
-    title_type_;
-
-    static const title_type_ title;
-
-    // url
-    //
-    typedef
-    mysql::query_column<
-      mysql::value_traits<
-        ::std::basic_string< char >,
-        mysql::id_string >::query_type,
-      mysql::id_string >
-    url_type_;
-
-    static const url_type_ url;
-
     // username
     //
     typedef
@@ -158,9 +134,9 @@ namespace odb
     typedef
     mysql::query_column<
       mysql::value_traits<
-        ::std::string,
-        mysql::id_string >::query_type,
-      mysql::id_string >
+        ::std::vector< unsigned char >,
+        mysql::id_blob >::query_type,
+      mysql::id_blob >
     password_type_;
 
     static const password_type_ password;
@@ -175,16 +151,6 @@ namespace odb
   const typename pointer_query_columns< ::ApplicationPassword, id_mysql, A >::app_type_
   pointer_query_columns< ::ApplicationPassword, id_mysql, A >::
   app (A::table_name, "`app`", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::ApplicationPassword, id_mysql, A >::title_type_
-  pointer_query_columns< ::ApplicationPassword, id_mysql, A >::
-  title (A::table_name, "`title`", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::ApplicationPassword, id_mysql, A >::url_type_
-  pointer_query_columns< ::ApplicationPassword, id_mysql, A >::
-  url (A::table_name, "`url`", 0);
 
   template <typename A>
   const typename pointer_query_columns< ::ApplicationPassword, id_mysql, A >::username_type_
@@ -221,18 +187,6 @@ namespace odb
       int app_value;
       my_bool app_null;
 
-      // title
-      //
-      details::buffer title_value;
-      unsigned long title_size;
-      my_bool title_null;
-
-      // url
-      //
-      details::buffer url_value;
-      unsigned long url_size;
-      my_bool url_null;
-
       // username
       //
       details::buffer username_value;
@@ -253,6 +207,9 @@ namespace odb
     struct app_tag;
 
     using object_traits<object_type>::id;
+
+    static id_type
+    id (const id_image_type&);
 
     static id_type
     id (const image_type&);
@@ -286,7 +243,7 @@ namespace odb
 
     typedef mysql::query_base query_base_type;
 
-    static const std::size_t column_count = 6UL;
+    static const std::size_t column_count = 4UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -307,7 +264,7 @@ namespace odb
     static const char table_name[];
 
     static void
-    persist (database&, const object_type&);
+    persist (database&, object_type&);
 
     static pointer_type
     find (database&, const id_type&);
@@ -418,30 +375,6 @@ namespace odb
 
     static const app_type_ app;
 
-    // title
-    //
-    typedef
-    mysql::query_column<
-      mysql::value_traits<
-        ::std::basic_string< char >,
-        mysql::id_string >::query_type,
-      mysql::id_string >
-    title_type_;
-
-    static const title_type_ title;
-
-    // url
-    //
-    typedef
-    mysql::query_column<
-      mysql::value_traits<
-        ::std::basic_string< char >,
-        mysql::id_string >::query_type,
-      mysql::id_string >
-    url_type_;
-
-    static const url_type_ url;
-
     // username
     //
     typedef
@@ -459,9 +392,9 @@ namespace odb
     typedef
     mysql::query_column<
       mysql::value_traits<
-        ::std::string,
-        mysql::id_string >::query_type,
-      mysql::id_string >
+        ::std::vector< unsigned char >,
+        mysql::id_blob >::query_type,
+      mysql::id_blob >
     password_type_;
 
     static const password_type_ password;
@@ -476,16 +409,6 @@ namespace odb
   const typename query_columns< ::ApplicationPassword, id_mysql, A >::app_type_
   query_columns< ::ApplicationPassword, id_mysql, A >::
   app (A::table_name, "`app`", 0);
-
-  template <typename A>
-  const typename query_columns< ::ApplicationPassword, id_mysql, A >::title_type_
-  query_columns< ::ApplicationPassword, id_mysql, A >::
-  title (A::table_name, "`title`", 0);
-
-  template <typename A>
-  const typename query_columns< ::ApplicationPassword, id_mysql, A >::url_type_
-  query_columns< ::ApplicationPassword, id_mysql, A >::
-  url (A::table_name, "`url`", 0);
 
   template <typename A>
   const typename query_columns< ::ApplicationPassword, id_mysql, A >::username_type_

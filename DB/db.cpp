@@ -1,16 +1,16 @@
 #include "db.h"
 
+odb::database *DB::db = 0;
 
 void DB::connect(QString username, QString password, QString dbname)
 {
-    db = auto_ptr<odb::database>(new odb::mysql::database(
-                                     username.toStdString().c_str(),
-                                     password.toStdString().c_str(),
-                                     dbname.toStdString().c_str())
-                                 );
+    db = new odb::mysql::database(username.toStdString().c_str(),
+                                  password.toStdString().c_str(),
+                                  dbname.toStdString().c_str());
 }
 
-auto_ptr<odb::database> DB::getDB()
+odb::database* DB::getDB()
 {
-    return DB::db;
+    return db;
 }
+

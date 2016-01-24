@@ -9,7 +9,7 @@
 
 class SocketListener : public QObject
 {
-    Q_OBJECT
+Q_OBJECT
     QLocalServer *sock;
     ConnectionaHandler *connHandler;
     Approver *approver;

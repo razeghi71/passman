@@ -8,9 +8,13 @@
 #include "user.h"
 #include <QSettings>
 #include <QThread>
+#include "api_connection_approver.h"
+#include "api_connection_handler.h"
+#include "socketlistener.h"
+#include "aes_crypto.h"
+#include "db.h"
 
 using namespace std;
-
 
 void startPasswordGetter(QString path, User normalUser)
 {
@@ -48,6 +52,7 @@ QString initializeMasterPassword(LocalCredentialSocket *checkPassSock, LocalCred
     }
 }
 
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
@@ -62,6 +67,13 @@ int main(int argc, char *argv[])
     QString passwordGetterSocket = settings.value("password_getter_socket","").toString();
     QString passwordCheckerSocket = settings.value("password_checker_socket","").toString();
 
+    QString dbUsername = settings.value("db_username","").toString();
+    QString dbPassword = settings.value("db_password","").toString();
+    QString dbName = settings.value("db_name","").toString();
+    QString apiListenerSocket = settings.value("api_listener_socket","/tmp/passman_api.sock").toString();
+    QString apiMessageViewerExec = settings.value("api_messageviewer_exec","").toString();
+    QString apiMessageViewerSocket = settings.value("api_messageviewer_socket","").toString();
+
     startPasswordGetter(passwordGetterExec, normalUser);
     startPasswordChecker(passwordCheckerExec);
 
@@ -71,7 +83,6 @@ int main(int argc, char *argv[])
     LocalCredentialSocket *checkPassSock = new LocalCredentialSocket;
 
     getPassSock->connectToServer(passwordGetterSocket);
-
     checkPassSock->connectToServer(passwordCheckerSocket);
 
     QString master_password = initializeMasterPassword(checkPassSock, getPassSock);
@@ -82,6 +93,16 @@ int main(int argc, char *argv[])
         QCoreApplication::quit();
     }
 
+    DB::connect(dbUsername,dbPassword,dbName);
+
+    SocketListener apiListener(apiListenerSocket,
+                   new APIConnectionApprover(apiMessageViewerSocket,apiMessageViewerExec,normalUser),
+                   new APIConnectionHandler(new AESCrypto(master_password.toStdString()))
+                );
+    apiListener.startListen();
+
     return a.exec();
+
+
 }
 

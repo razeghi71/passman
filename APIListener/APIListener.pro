@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-CONFIG += qt staticlib
+CONFIG += qt staticlib c++11
 
 QT += network
 QT-= gui
@@ -11,5 +11,7 @@ SOURCES = api_connection_approver.cpp \
 HEADERS = api_connection_approver.h \
           api_connection_handler.h
 
-INCLUDEPATH += ../Connection ../ApplicationRunner ../DB
-LIBS += -L../Connection -lConnection -L../ApplicationRunner -lApplicationRunner -L../DB -lDB
+INCLUDEPATH += ../Connection \
+               ../ApplicationRunner \
+               ../DB \
+               ../Encryption

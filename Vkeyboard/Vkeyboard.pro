@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-CONFIG += qt staticlib
+CONFIG += qt staticlib  c++11
 
 QT-= gui
 

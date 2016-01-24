@@ -2,10 +2,11 @@
 #include <unistd.h>
 #include <raw_keyboard_reader.h>
 #include <curses.h>
-
+#include <QDebug>
 
 APIMessageViewer::APIMessageViewer(QString appHash, QString appExec, QString device)
 {
+    srand(time(0));
     this->appExec = appExec;
     this->appHash = appHash;
     this->device = device;
@@ -33,6 +34,8 @@ bool APIMessageViewer::Ask(QString message)
         QString userInput = keyboardReader.readLine().trimmed();
         finilizeCurses();
 
+        qDebug() << userInput << allowCode ;
+
         if ( userInput == allowCode )
             return true;
         if ( userInput == rejectCode )
@@ -49,13 +52,13 @@ winsize APIMessageViewer::getTerminalSize()
 
 QPoint APIMessageViewer::getNewRandomPoint(int strWidth)
 {
-    srand(time(0));
     winsize terminalSize = getTerminalSize();
     int row = 0;
     do {
         row = rand() % terminalSize.ws_row;
     } while (printedPointRows.contains(row));
-    int col = rand() % (terminalSize.ws_row -  strWidth);
+    printedPointRows.insert(row);
+    int col = rand() % (terminalSize.ws_col -  strWidth);
     return QPoint(row,col);
 }
 
@@ -65,11 +68,13 @@ void APIMessageViewer::printMessage(QString message, int colorPair)
     attron(COLOR_PAIR(colorPair));
     mvaddstr(messagePlace.x(),messagePlace.y(),message.toStdString().c_str());
     attroff(COLOR_PAIR(colorPair));
+    refresh();
 }
 
 void APIMessageViewer::initCurses()
 {
     initscr();
+    clear();
     start_color();
     init_pair(1,COLOR_BLUE,COLOR_RED);
     init_pair(2,COLOR_BLACK,COLOR_GREEN);
@@ -78,7 +83,7 @@ void APIMessageViewer::initCurses()
 
 void APIMessageViewer::finilizeCurses()
 {
-    refresh();
     endwin();
 }
+
 

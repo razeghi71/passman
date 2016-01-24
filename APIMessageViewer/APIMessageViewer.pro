@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += qt
+CONFIG += qt  c++11
 QT += network
 QT -= gui
 TARGET = APIMessageViewer

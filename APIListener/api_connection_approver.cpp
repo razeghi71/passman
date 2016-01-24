@@ -5,12 +5,15 @@
 #include "simple_external_process.h"
 #include "local_credential_socket.h"
 #include "external_process.h"
+#include <QThread>
 
-APIConnectionApprover::APIConnectionApprover(QString messageViewerPath, User normalUser)
+APIConnectionApprover::APIConnectionApprover(QString messageViewerSocket, QString messageViewerPath, User normalUser)
 {
+    this->messageViewerSocket = messageViewerSocket;
     this->messageViewerPath = messageViewerPath;
     this->normalUser = normalUser;
 }
+
 
 void APIConnectionApprover::startMessageViewer()
 {
@@ -28,17 +31,24 @@ void APIConnectionApprover::startMessageViewer()
 bool APIConnectionApprover::viewMessage(QString message)
 {
     LocalCredentialSocket socket;
-    socket.connectToServer();
+    socket.connectToServer(messageViewerSocket);
     QByteArray bytedMessage = QVariant(message+"\n").toByteArray();
     socket.write(bytedMessage);
+    socket.flush();
     socket.waitForReadyRead();
     return socket.readLine().trimmed().toInt() == 1;
 }
 
 
-void APIConnectionApprover::handleNewApp(QString execFileHash, QString execPath, auto_ptr<odb::database> db)
+void APIConnectionApprover::handleNewApp(QLocalSocket *sock)
 {
+    QLocalSocketCredentialExtractor credentialExtractor(sock);
+    QString execFileHash = credentialExtractor.getExecFileHash();
+    QString execPath = credentialExtractor.getExecPath();
+
+    odb::database *db = DB::getDB();
     startMessageViewer();
+    QThread::sleep(2);
     bool shouldAdd = viewMessage("A new apps wants to connect. add it to list?");
     if ( shouldAdd )
     {
@@ -47,21 +57,21 @@ void APIConnectionApprover::handleNewApp(QString execFileHash, QString execPath,
     }
 }
 
-void APIConnectionApprover::handleUpdatedApp(QString execFileHash, ApplicationResult appExecEqualQuery, QString execPath, auto_ptr<odb::database> db)
+void APIConnectionApprover::handleUpdatedApp(QLocalSocket *sock, Application& app)
 {
+    QLocalSocketCredentialExtractor credentialExtractor(sock);
+    QString execFileHash = credentialExtractor.getExecFileHash();
+    QString execPath = credentialExtractor.getExecPath();
+
+    odb::database *db = DB::getDB();
     startMessageViewer();
+    QThread::sleep(2);
     bool shouldUpdate = viewMessage("An existing's app hash changed. Want to update?");
     if ( shouldUpdate  )
     {
-        for ( ApplicationResult::iterator it (appExecEqualQuery.begin());
-              it != appExecEqualQuery.end() ;
-              it++ ) {
-            Application& p(*it);
-            p.setExecutablePath(execPath.toStdString());
-            p.setExecutableHash(execFileHash.toStdString());
-            db->update(p);
-            break;
-        }
+        app.setExecutablePath(execPath.toStdString());
+        app.setExecutableHash(execFileHash.toStdString());
+        db->update(app);
     }
 }
 
@@ -71,17 +81,22 @@ bool APIConnectionApprover::Approve(QLocalSocket *sock)
     QString execFileHash = credentialExtractor.getExecFileHash();
     QString execPath = credentialExtractor.getExecPath();
 
-    auto_ptr<odb::database> db = DB::getDB();
+    odb::database *db = DB::getDB();
 
     odb::transaction t (db->begin ());
 
-    ApplicationResult appExecEqualQuery (db->query<Application> (ApplicationQuery::executable_path == execPath.toStdString()));
-    ApplicationResult appHashExecEqualQuery (db->query<Application>(ApplicationQuery::executable_path == execPath.toStdString() &&
-                                                                    ApplicationQuery::executable_hash == execFileHash.toStdString()));
+    ApplicationResult appExecEqualQuery (db->query<Application> (ApplicationQuery::executablePath == execPath.toStdString()));
+    ApplicationResult appHashExecEqualQuery (db->query<Application>(ApplicationQuery::executablePath == execPath.toStdString() &&
+                                                                    ApplicationQuery::executableHash == execFileHash.toStdString()));
+
     if ( appExecEqualQuery.size() == 0 )
-        handleNewApp(execFileHash, execPath, db);
+        handleNewApp(sock);
+
     else if ( appHashExecEqualQuery.size() == 0 )
-        handleUpdatedApp(execFileHash, appExecEqualQuery, execPath, db);
+    {
+        Application& app(*appExecEqualQuery.begin());
+        handleUpdatedApp(sock, app);
+    }
 
     t.commit ();
     return true;

@@ -5,18 +5,16 @@
 DROP TABLE IF EXISTS `ApplicationPassword`;
 
 CREATE TABLE `ApplicationPassword` (
-  `passwordID` INT NOT NULL PRIMARY KEY,
+  `passwordID` INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
   `app` INT NULL,
-  `title` TEXT NULL,
-  `url` TEXT NULL,
   `username` TEXT NULL,
-  `password` TEXT NOT NULL)
+  `password` BLOB NOT NULL)
  ENGINE=InnoDB;
 
 /*
 ALTER TABLE `ApplicationPassword`
   ADD CONSTRAINT `ApplicationPassword_app_fk`
     FOREIGN KEY (`app`)
-    REFERENCES `Application` (`app_id`)
+    REFERENCES `Application` (`appId`)
 */
 

@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-CONFIG += qt staticlib
+CONFIG += qt staticlib  c++11
 
 QT-= gui
 
@@ -15,3 +15,5 @@ HEADERS = Application.h \
     ApplicationPassword.h \
     ApplicationPassword-odb.hxx \
     db.h
+
+

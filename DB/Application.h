@@ -11,18 +11,19 @@ class Application
   friend class odb::access;
   Application () {}
 
-  #pragma db id
-  int app_id;
+  #pragma db id auto
+  int appId;
 
-  string executable_path;
-  string executable_hash;
+  string executablePath;
+  string executableHash;
 public :
-  Application(string executable_path, string executable_hash);
-  string getExecutablePath() const;
-  string getExecutableHash() const;
+  Application(string executablePath, string executableHash);
 
-  void setExecutableHash(const string &value);
+  string getExecutablePath() const;
   void setExecutablePath(const string &value);
+  string getExecutableHash() const;
+  void setExecutableHash(const string &value);
+  int getAppId() const;
 };
 
 #endif
