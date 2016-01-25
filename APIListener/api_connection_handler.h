@@ -5,12 +5,13 @@
 #include "Application.h"
 #include "ApplicationPassword.h"
 #include "encryption.h"
+#include "message_viewer_client.h"
 
-class APIConnectionHandler : public ConnectionaHandler
+class APIConnectionHandler : public ConnectionaHandler, MessageViewerClient
 {
     Encryption *enc;
 public:
-    APIConnectionHandler(Encryption *enc);
+    APIConnectionHandler(Encryption *enc, QString messageViewerSocket , QString messageViewerPath, User normalUser);
     void handle(QLocalSocket *sock);
     void handleGetCommand(QLocalSocket *sock);
     void handleSetCommand(QLocalSocket *sock);

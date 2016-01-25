@@ -97,7 +97,10 @@ int main(int argc, char *argv[])
 
     SocketListener apiListener(apiListenerSocket,
                    new APIConnectionApprover(apiMessageViewerSocket,apiMessageViewerExec,normalUser),
-                   new APIConnectionHandler(new AESCrypto(master_password.toStdString()))
+                   new APIConnectionHandler(new AESCrypto(master_password.toStdString()),
+                                            apiMessageViewerSocket,
+                                            apiMessageViewerExec,
+                                            normalUser)
                 );
     apiListener.startListen();
 

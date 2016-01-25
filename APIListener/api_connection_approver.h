@@ -4,16 +4,12 @@
 #include "db.h"
 #include <QString>
 #include "user.h"
+#include "message_viewer_client.h"
 
-class APIConnectionApprover : public Approver
+class APIConnectionApprover : public Approver, MessageViewerClient
 {
-    QString messageViewerSocket;
-    QString messageViewerPath;
-    User normalUser;
 public:
     APIConnectionApprover(QString messageViewerSocket , QString messageViewerPath, User normalUser);
-    void startMessageViewer();
-    bool viewMessage(QString message);
     bool Approve(QLocalSocket *sock);
     void handleNewApp(QLocalSocket *sock);
     void handleUpdatedApp(QLocalSocket *sock, Application& app);

@@ -3,10 +3,12 @@
 #include "db.h"
 
 
-APIConnectionHandler::APIConnectionHandler(Encryption *enc)
+APIConnectionHandler::APIConnectionHandler(Encryption *enc, QString messageViewerSocket, QString messageViewerPath, User normalUser)
+    : MessageViewerClient(messageViewerSocket, messageViewerPath, normalUser)
 {
     this->enc = enc;
 }
+
 
 void APIConnectionHandler::handleGetCommand(QLocalSocket *sock)
 {
@@ -20,20 +22,27 @@ void APIConnectionHandler::handleGetCommand(QLocalSocket *sock)
 
     if ( passwordResult.size() != 0 )
     {
-        ApplicationPassword applicationPassword(*passwordResult.begin());
 
-        sock->write(QVariant(applicationPassword.getUsername().get().c_str()).toByteArray());
-        sock->write("\n");
-        std::vector<unsigned char> dbEncryptedPassword = applicationPassword.getPassword();
-        string encryptedPassword(dbEncryptedPassword.begin(),  dbEncryptedPassword.end());
-        string decryptedPassword = enc->decrypt(encryptedPassword);
-        sock->write(QVariant(decryptedPassword.c_str()).toByteArray());
-        sock->write("\n");
-    } else {
-        sock->write("\n\n");
+        bool allow = startMessageViewerAndGetResult("an application want's to get a password, allow or reject?");
+
+        if ( allow )
+        {
+            ApplicationPassword applicationPassword(*passwordResult.begin());
+
+            sock->write(QVariant(applicationPassword.getUsername().get().c_str()).toByteArray());
+            sock->write("\n");
+            std::vector<unsigned char> dbEncryptedPassword = applicationPassword.getPassword();
+            string encryptedPassword(dbEncryptedPassword.begin(),  dbEncryptedPassword.end());
+            string decryptedPassword = enc->decrypt(encryptedPassword);
+            sock->write(QVariant(decryptedPassword.c_str()).toByteArray());
+            sock->write("\n");
+            sock->flush();
+            sock->close();
+            return;
+        }
     }
-
-
+    sock->write("\n\n");
+    sock->flush();
     sock->close();
 }
 
@@ -47,13 +56,21 @@ void APIConnectionHandler::handleSetCommand(QLocalSocket *sock)
 
     sock->waitForReadyRead();
     string encryptedPassword = enc->encrypt(sock->readLine().trimmed().toStdString());
-    vector<unsigned char> dbEncryptedPassword (encryptedPassword.begin(), encryptedPassword.end());
 
-    ApplicationPassword appPass(&connectedApp, username.toStdString(), dbEncryptedPassword);
+    bool allow = startMessageViewerAndGetResult("an application want's to set a password, allow or reject?");
 
-    int passwordId = db->persist(appPass);
+    if ( allow )
+    {
+        vector<unsigned char> dbEncryptedPassword (encryptedPassword.begin(), encryptedPassword.end());
 
-    sock->write(QVariant(passwordId).toByteArray());
+        ApplicationPassword appPass(&connectedApp, username.toStdString(), dbEncryptedPassword);
+
+        int passwordId = db->persist(appPass);
+
+        sock->write(QVariant(passwordId).toByteArray());
+    } else {
+        sock->write("-1");
+    }
 
     sock->write("\n");
     sock->close();

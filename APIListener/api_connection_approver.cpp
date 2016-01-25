@@ -8,37 +8,9 @@
 #include <QThread>
 
 APIConnectionApprover::APIConnectionApprover(QString messageViewerSocket, QString messageViewerPath, User normalUser)
+    : MessageViewerClient(messageViewerSocket, messageViewerPath, normalUser)
 {
-    this->messageViewerSocket = messageViewerSocket;
-    this->messageViewerPath = messageViewerPath;
-    this->normalUser = normalUser;
 }
-
-
-void APIConnectionApprover::startMessageViewer()
-{
-    ExternalProcess *messageViewer
-            = new SudoExternalProcess(
-                new OpenvtExternalProcess(
-                    new SudoExternalProcess(
-                        new SimpleExternalProcess(messageViewerPath), normalUser
-                    )
-                , 23) // openvt terminal number
-              );
-    messageViewer->run();
-}
-
-bool APIConnectionApprover::viewMessage(QString message)
-{
-    LocalCredentialSocket socket;
-    socket.connectToServer(messageViewerSocket);
-    QByteArray bytedMessage = QVariant(message+"\n").toByteArray();
-    socket.write(bytedMessage);
-    socket.flush();
-    socket.waitForReadyRead();
-    return socket.readLine().trimmed().toInt() == 1;
-}
-
 
 void APIConnectionApprover::handleNewApp(QLocalSocket *sock)
 {
@@ -47,9 +19,8 @@ void APIConnectionApprover::handleNewApp(QLocalSocket *sock)
     QString execPath = credentialExtractor.getExecPath();
 
     odb::database *db = DB::getDB();
-    startMessageViewer();
-    QThread::sleep(2);
-    bool shouldAdd = viewMessage("A new apps wants to connect. add it to list?");
+
+    bool shouldAdd = startMessageViewerAndGetResult("A new apps wants to connect. add it to list?");
     if ( shouldAdd )
     {
         Application app(execPath.toStdString(), execFileHash.toStdString());
@@ -64,9 +35,8 @@ void APIConnectionApprover::handleUpdatedApp(QLocalSocket *sock, Application& ap
     QString execPath = credentialExtractor.getExecPath();
 
     odb::database *db = DB::getDB();
-    startMessageViewer();
-    QThread::sleep(2);
-    bool shouldUpdate = viewMessage("An existing's app hash changed. Want to update?");
+
+    bool shouldUpdate = startMessageViewerAndGetResult("An existing's app hash changed. Want to update?");
     if ( shouldUpdate  )
     {
         app.setExecutablePath(execPath.toStdString());
